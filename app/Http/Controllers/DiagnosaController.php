@@ -5,10 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Diagnosa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 
 class DiagnosaController extends Controller
 {
+    public function index()
+    {
+        $diagnosas = Diagnosa::latest()->paginate(10);
+
+        return response()->json([
+            'message' => 'Riwayat diagnosa berhasil diambil',
+            'data' => $diagnosas,
+        ]);
+    }
+
     public function diagnose(Request $request)
     {
         $request->validate([
@@ -34,7 +43,6 @@ class DiagnosaController extends Controller
         }
 
         $result = $response->json();
-
         $imagePath = $image->store('diagnosas', 'public');
 
         $diagnosa = Diagnosa::create([
