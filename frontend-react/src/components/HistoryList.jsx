@@ -1,50 +1,83 @@
-import { useEffect, useState } from 'react';
-import { getDiagnosisHistory } from '../services/api';
+import { useEffect, useState } from 'react'
+import { getDiagnosisHistory } from '../services/api'
 
 export default function HistoryList() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchHistory() {
       try {
-        const response = await getDiagnosisHistory();
-        setItems(response.data.data || []);
+        const response = await getDiagnosisHistory()
+        setItems(response.data.data || [])
       } catch (error) {
-        alert(error.message);
+        alert(error.message)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
 
-    fetchHistory();
-  }, []);
+    fetchHistory()
+  }, [])
 
-  if (loading) return <p>Memuat riwayat...</p>;
-  if (!items.length) return <p>Belum ada riwayat diagnosa.</p>;
+  if (loading) {
+    return (
+      <div className="rounded-[28px] border border-[#E7E9E3] bg-white p-6 text-slate-500">
+        Memuat riwayat...
+      </div>
+    )
+  }
+
+  if (!items.length) {
+    return (
+      <div className="rounded-[28px] border border-[#E7E9E3] bg-white p-6 text-slate-500">
+        Belum ada riwayat diagnosa.
+      </div>
+    )
+  }
 
   return (
-    <div style={{ display: 'grid', gap: '16px' }}>
+    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
       {items.map((item) => (
-        <div
+        <article
           key={item.id}
-          style={{
-            border: '1px solid #ddd',
-            borderRadius: '12px',
-            padding: '16px',
-          }}
+          className="overflow-hidden rounded-[28px] border border-[#E7E9E3] bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5"
         >
           <img
             src={item.image_url}
             alt={item.disease}
-            style={{ width: '100%', maxHeight: '220px', objectFit: 'cover', borderRadius: '8px' }}
+            className="h-56 w-full object-cover"
           />
-          <h3>{item.disease}</h3>
-          <p>Confidence: {item.confidence}%</p>
-          <p>Status: {item.is_healthy ? 'Sehat' : 'Terindikasi sakit'}</p>
-          <p>Saran: {item.treatment}</p>
-        </div>
+
+          <div className="p-5">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="text-lg font-semibold leading-7 text-slate-900">
+                {item.disease}
+              </h3>
+              <span
+                className={`rounded-full px-3 py-1.5 text-xs font-medium ${
+                  item.is_healthy
+                    ? 'bg-[#E8F5E8] text-[#4C7C47]'
+                    : 'bg-[#F8EFD8] text-[#9A6B17]'
+                }`}
+              >
+                {item.is_healthy ? 'Sehat' : 'Sakit'}
+              </span>
+            </div>
+
+            <div className="mt-4 rounded-2xl bg-[#F8FAF6] p-4">
+              <p className="text-sm text-slate-500">Confidence</p>
+              <p className="mt-1 text-2xl font-semibold text-slate-900">
+                {item.confidence}%
+              </p>
+            </div>
+
+            <p className="mt-4 text-sm leading-7 text-slate-500">
+              {item.treatment}
+            </p>
+          </div>
+        </article>
       ))}
     </div>
-  );
+  )
 }
